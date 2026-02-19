@@ -2,7 +2,7 @@
   "info": {
     "name": "Flash Deal API",
     "_postman_id": "flash-deal-collection",
-    "description": "Flash Deal Reservation & Checkout API",
+    "description": "Flash Deal Reservation & Checkout API with environment variables",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -15,26 +15,42 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Flash Product\",\n  \"totalStock\": 200\n}"
+          "raw": "{\n  \"name\": \"{{productName}}\",\n  \"totalStock\": {{totalStock}}\n}"
         },
         "url": {
-          "raw": "http://localhost:5000/products",
+          "raw": "http://{{host}}:{{port}}/products",
           "protocol": "http",
-          "host": ["localhost"],
-          "port": "5000",
+          "host": ["{{host}}:{{port}}"],
           "path": ["products"]
         }
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Save productId from response into environment variable",
+              "let response = pm.response.json();",
+              "if (response._id) {",
+              "    pm.collectionVariables.set(\"productId\", response._id);",
+              "    console.log(\"Saved productId:\", response._id);",
+              "} else {",
+              "    console.log(\"No _id found in response\");",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
     },
     {
       "name": "Get Product Status",
       "request": {
         "method": "GET",
         "url": {
-          "raw": "http://localhost:5000/products/{{productId}}",
+          "raw": "http://{{host}}:{{port}}/products/{{productId}}",
           "protocol": "http",
-          "host": ["localhost"],
-          "port": "5000",
+          "host": ["{{host}}:{{port}}"],
           "path": ["products", "{{productId}}"]
         }
       }
@@ -48,13 +64,12 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"userId\": \"64f000000000000000000001\",\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 2\n}"
+          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"productId\": \"{{productId}}\",\n  \"quantity\": {{quantity}}\n}"
         },
         "url": {
-          "raw": "http://localhost:5000/cart/reserve",
+          "raw": "http://{{host}}:{{port}}/cart/reserve",
           "protocol": "http",
-          "host": ["localhost"],
-          "port": "5000",
+          "host": ["{{host}}:{{port}}"],
           "path": ["cart", "reserve"]
         }
       }
@@ -68,13 +83,12 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"userId\": \"64f000000000000000000001\",\n  \"productId\": \"{{productId}}\"\n}"
+          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"productId\": \"{{productId}}\"\n}"
         },
         "url": {
-          "raw": "http://localhost:5000/cart/cancel",
+          "raw": "http://{{host}}:{{port}}/cart/cancel",
           "protocol": "http",
-          "host": ["localhost"],
-          "port": "5000",
+          "host": ["{{host}}:{{port}}"],
           "path": ["cart", "cancel"]
         }
       }
@@ -88,16 +102,24 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"userId\": \"64f000000000000000000001\",\n  \"productId\": \"{{productId}}\"\n}"
+          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"productId\": \"{{productId}}\"\n}"
         },
         "url": {
-          "raw": "http://localhost:5000/cart/checkout",
+          "raw": "http://{{host}}:{{port}}/cart/checkout",
           "protocol": "http",
-          "host": ["localhost"],
-          "port": "5000",
+          "host": ["{{host}}:{{port}}"],
           "path": ["cart", "checkout"]
         }
       }
     }
+  ],
+  "variable": [
+    { "key": "host", "value": "localhost" },
+    { "key": "port", "value": "5000" },
+    { "key": "userId", "value": "64f000000000000000000001" },
+    { "key": "productName", "value": "Flash Product" },
+    { "key": "totalStock", "value": "200" },
+    { "key": "quantity", "value": "2" },
+    { "key": "productId", "value": "" }
   ]
 }
