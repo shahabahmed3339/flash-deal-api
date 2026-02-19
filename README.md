@@ -55,11 +55,11 @@ This ensures abandoned reservations do not permanently block inventory.
 
 Redis keyspace notifications are enabled:
 
-notify-keyspace-events Ex
+`notify-keyspace-events Ex`
 
 The system subscribes to expiration events:
 
-**keyevent@0**:expired
+`**keyevent@0**:expired`
 
 When a TTL key expires:
 
