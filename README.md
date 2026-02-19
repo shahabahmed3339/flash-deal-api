@@ -98,38 +98,43 @@ This guarantees zero overselling.
 
 ## 1️⃣ Clone the Repository
 
-git clone `https://github.com/shahabahmed3339/flash-deal-api.git`
+`git clone https://github.com/shahabahmed3339/flash-deal-api.git`
 
 `cd flash-deal-api`
 
 ## 2️⃣ Install Dependencies
 
-npm install
+`npm install`
 
 ## 3️⃣ Start MongoDB
 
-mongod
+`mongod`
 
-Or use MongoDB Atlas.
+Or use `MongoDB Atlas`.
 
 ## 4️⃣ Start Redis
 
-redis-server
+`redis-server`
 
-Enable keyspace notifications in redis.conf:
+Enable keyspace notifications in `redis.conf`:
 
-notify-keyspace-events Ex
+`notify-keyspace-events Ex`
+
+Or use Docker container for MongoDB and Redis (Recommended)
 
 ## 5️⃣ Create .env File
 
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/flashdeal
-REDIS_URL=redis://127.0.0.1:6379
-RESERVATION_TTL=600
+`PORT=5000`
+
+`MONGO_URI=mongodb://localhost:27017/flashdeal`
+
+`REDIS_URL=redis://127.0.0.1:6379`
+
+`RESERVATION_TTL=600`
 
 ## 6️⃣ Start the Server
 
-npm run dev
+`npm run dev`
 
 ------------------------------------------------------------------------
 
@@ -137,10 +142,13 @@ npm run dev
 
   Variable          Description
   ----------------- ------------------------------------
-  PORT              Server port
-  MONGO_URI         MongoDB connection string
-  REDIS_URL         Redis url
-  RESERVATION_TTL   Reservation expiry time in seconds
+  `PORT`              Server port
+
+  `MONGO_URI`         MongoDB connection string
+
+  `REDIS_URL`         Redis url
+
+  `RESERVATION_TTL`   Reservation expiry time in seconds
 
 ------------------------------------------------------------------------
 
@@ -148,31 +156,31 @@ npm run dev
 
 ## 1️⃣ Create Product
 
-POST /products
+`POST /products`
 
-Body: { "name": "iPhone 15", "totalStock": 10 }
+`Body: { "name": "iPhone 15", "totalStock": 10 }`
 
 ## 2️⃣ Reserve Product
 
-POST /cart/reserve
+`POST /cart/reserve`
 
-Body: { "userId": "user1", "productId": "PRODUCT_ID", "quantity": 1 }
+`Body: { "userId": "user1", "productId": "PRODUCT_ID", "quantity": 1 }`
 
 ## 3️⃣ Cancel Reservation
 
-POST /cart/cancel
+`POST /cart/cancel`
 
-Body: { "userId": "user1", "productId": "PRODUCT_ID" }
+`Body: { "userId": "user1", "productId": "PRODUCT_ID" }`
 
 ## 4️⃣ Checkout
 
-POST /cart/checkout
+`POST /cart/checkout`
 
-Body: { "userId": "user1", "productId": "PRODUCT_ID" }
+`Body: { "userId": "user1", "productId": "PRODUCT_ID" }`
 
 ## 5️⃣ Get Product Status
 
-GET /products/:productId
+`GET /products/:productId`
 
 ------------------------------------------------------------------------
 
