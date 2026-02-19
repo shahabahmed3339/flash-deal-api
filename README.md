@@ -110,7 +110,7 @@ This guarantees zero overselling.
 
 `mongod`
 
-Or use `MongoDB Atlas`.
+Or use **MongoDB Atlas**.
 
 ## 4️⃣ Start Redis
 
@@ -120,7 +120,7 @@ Enable keyspace notifications in `redis.conf`:
 
 `notify-keyspace-events Ex`
 
-Or use Docker container for MongoDB and Redis (Recommended)
+Or use Docker container for MongoDB and Redis **(Recommended)**
 
 ## 5️⃣ Create .env File
 
