@@ -1,0 +1,103 @@
+{
+  "info": {
+    "name": "Flash Deal API",
+    "_postman_id": "flash-deal-collection",
+    "description": "Flash Deal Reservation & Checkout API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Product",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Flash Product\",\n  \"totalStock\": 200\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/products",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["products"]
+        }
+      }
+    },
+    {
+      "name": "Get Product Status",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:5000/products/{{productId}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["products", "{{productId}}"]
+        }
+      }
+    },
+    {
+      "name": "Reserve Product",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"64f000000000000000000001\",\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 2\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/cart/reserve",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["cart", "reserve"]
+        }
+      }
+    },
+    {
+      "name": "Cancel Reservation",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"64f000000000000000000001\",\n  \"productId\": \"{{productId}}\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/cart/cancel",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["cart", "cancel"]
+        }
+      }
+    },
+    {
+      "name": "Checkout",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"64f000000000000000000001\",\n  \"productId\": \"{{productId}}\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/cart/checkout",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["cart", "checkout"]
+        }
+      }
+    }
+  ]
+}

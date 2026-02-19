@@ -13,10 +13,10 @@ exports.getProductStatus = async (productId) => {
   const reservedStock = parseInt(reserved || 0);
 
   return {
+    name: product.name,
     totalStock: product.totalStock,
     soldStock: product.soldStock,
     reservedStock,
-    availableStock:
-      product.totalStock - product.soldStock - reservedStock
+    availableStock: product.totalStock - product.soldStock - reservedStock
   };
 };

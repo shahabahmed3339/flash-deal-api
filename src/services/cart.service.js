@@ -3,8 +3,6 @@ const redis = require('../config/redis');
 const Product = require('../models/product.model');
 const Order = require('../models/order.model');
 
-const RESERVATION_TTL = 600;
-
 exports.reserveProduct = async (userId, productId, quantity) => {
   const product = await Product.findById(productId);
   if (!product) throw new Error('Product not found');
@@ -13,9 +11,10 @@ exports.reserveProduct = async (userId, productId, quantity) => {
   const dataKey = `reservation:data:${userId}:${productId}`;
   const ttlKey = `reservation:ttl:${userId}:${productId}`;
 
+  await redis.watch(reservedKey);
+
   const reserved = parseInt(await redis.get(reservedKey) || 0);
-  const available =
-    product.totalStock - product.soldStock - reserved;
+  const available = product.totalStock - product.soldStock - reserved;
 
   if (available < quantity)
     throw new Error('Not enough stock available');
@@ -24,9 +23,10 @@ exports.reserveProduct = async (userId, productId, quantity) => {
 
   multi.incrby(reservedKey, quantity);
   multi.set(dataKey, quantity); // NO TTL
-  multi.set(ttlKey, 1, 'EX', RESERVATION_TTL); // TTL trigger
+  multi.set(ttlKey, 1, 'EX', process.env.RESERVATION_TTL); // TTL trigger
 
-  await multi.exec();
+  const result = await multi.exec();
+  if (!result) retry();
 
   return { message: 'Product reserved for 10 minutes' };
 };
@@ -49,20 +49,29 @@ exports.cancelReservation = async (userId, productId) => {
 };
 
 exports.checkout = async (userId, productId) => {
+  const dataKey = `reservation:data:${userId}:${productId}`;
+  const ttlKey = `reservation:ttl:${userId}:${productId}`;
+  const reservedKey = `reserved:product:${productId}`;
+
+  const quantity = await redis.get(dataKey);
+  if (!quantity) throw new Error('No reservation found');
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    const dataKey = `reservation:data:${userId}:${productId}`;
-    const ttlKey = `reservation:ttl:${userId}:${productId}`;
-    const reservedKey = `reserved:product:${productId}`;
-
-    const quantity = await redis.get(dataKey);
-    if (!quantity) throw new Error('Reservation expired');
-
     const product = await Product.findById(productId).session(session);
 
-    product.soldStock += parseInt(quantity);
+    if (!product) throw new Error('Product not found');
+
+    const qty = parseInt(quantity);
+
+    if (product.soldStock + qty > product.totalStock) {
+      throw new Error('Stock exceeded during checkout');
+    }
+
+    product.soldStock += qty;
+
     await product.save({ session });
 
     await Order.create([{

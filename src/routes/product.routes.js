@@ -15,7 +15,7 @@ router.post(
 );
 
 router.get(
-  '/:id/status',
+  '/:id',
   validate(productIdParamSchema, 'params'),
   productController.getStatus
 );
