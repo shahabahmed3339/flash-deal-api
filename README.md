@@ -140,8 +140,6 @@ Or use Docker container for MongoDB and Redis **(Recommended)**
 
 # 📦 Required Environment Variables
 
-  Variable          Description
-  ----------------- ------------------------------------
   `PORT`              Server port
 
   `MONGO_URI`         MongoDB connection string
