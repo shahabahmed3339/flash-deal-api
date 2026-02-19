@@ -98,7 +98,9 @@ This guarantees zero overselling.
 
 ## 1️⃣ Clone the Repository
 
-git clone `<your-repo-url>`{=html} cd flash-deal-api
+git clone `https://github.com/shahabahmed3339/flash-deal-api.git`
+
+`cd flash-deal-api`
 
 ## 2️⃣ Install Dependencies
 
