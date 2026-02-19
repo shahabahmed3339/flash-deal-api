@@ -182,7 +182,7 @@ Or use Docker container for MongoDB and Redis **(Recommended)**
 
 ## Bonus Point
 
-You can import the `flash-deal-api.postman_collection.json` in Postman directly
+You can import `flash-deal-api.postman_collection.json` in Postman directly
 
 ------------------------------------------------------------------------
 
