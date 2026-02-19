@@ -180,6 +180,10 @@ Or use Docker container for MongoDB and Redis **(Recommended)**
 
 `GET /products/:productId`
 
+## Bonus Point
+
+You can import the `flash-deal-api.postman_collection.json` in Postman directly
+
 ------------------------------------------------------------------------
 
 # 🏗 System Design Summary
