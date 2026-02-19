@@ -59,7 +59,7 @@ Redis keyspace notifications are enabled:
 
 The system subscribes to expiration events:
 
-`**keyevent@0**:expired`
+`keyevent@0:expired`
 
 When a TTL key expires:
 
