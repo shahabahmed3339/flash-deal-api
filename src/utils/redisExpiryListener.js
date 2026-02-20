@@ -7,26 +7,23 @@ exports.initRedisExpiryListener = async () => {
   await subscriber.psubscribe('__keyevent@0__:expired');
 
   subscriber.on('pmessage', async (_, __, key) => {
-    if (key.startsWith('reservation:ttl:')) {
+    if (!key.startsWith('reservation:ttl:')) return;
 
-      const parts = key.split(':');
-      const userId = parts[2];
-      const productId = parts[3];
+    const [, , userId, productId] = key.split(':');
 
-      const dataKey = `reservation:data:${userId}:${productId}`;
-      const reservedKey = `reserved:product:${productId}`;
-      const ttlKey = `reservation:ttl:${userId}:${productId}`;
+    const dataKey = `reservation:data:${userId}:${productId}`;
+    const reservedKey = `reserved:product:${productId}`;
 
-      const quantity = await redis.get(dataKey);
-      if (!quantity) return;
+    const quantity = await redis.get(dataKey);
+    if (!quantity) return;
 
-      const multi = redis.multi();
-      multi.decrby(reservedKey, quantity);
-      multi.del(dataKey);
-      multi.del(ttlKey);
-      await multi.exec();
+    const qty = parseInt(quantity);
 
-      console.log(`Reservation expired → Released ${quantity} units`);
-    }
+    await redis.multi()
+      .decrby(reservedKey, qty)
+      .del(dataKey)
+      .exec();
+
+    console.log(`Reservation expired → Released ${qty}`);
   });
 };

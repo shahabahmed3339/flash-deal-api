@@ -29,6 +29,11 @@ Instead of locking MongoDB rows during checkout, we:
 
 This prevents database locking under heavy traffic.
 
+Atomic reservation is implemented using Redis Lua scripting.
+
+This ensures that stock validation and reservation happen in a single atomic operation inside Redis, preventing race conditions even under extreme concurrency.
+
+
 ------------------------------------------------------------------------
 
 # ⏳ How TTL Works
