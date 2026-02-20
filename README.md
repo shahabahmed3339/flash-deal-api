@@ -10,6 +10,8 @@ A production-ready stock reservation system built using:
 
 Designed to prevent overselling during high-concurrency flash sales.
 
+[DEMO](https://www.loom.com/share/f00dcfbf97f84e1da2a69dbeac139209)
+
 ------------------------------------------------------------------------
 
 # 🧠 Why Redis Is Used
@@ -167,19 +169,19 @@ Or use Docker container for MongoDB and Redis **(Recommended)**
 
 `POST /cart/reserve`
 
-`Body: { "userId": "user1", "productId": "PRODUCT_ID", "quantity": 1 }`
+`Body: { "userId": "user1", "items": [{"productId": "PRODUCT_ID", "quantity": 1}] }`
 
 ## 3️⃣ Cancel Reservation
 
 `POST /cart/cancel`
 
-`Body: { "userId": "user1", "productId": "PRODUCT_ID" }`
+`Body: { "userId": "user1", "productIds": ["PRODUCT_ID"] }`
 
 ## 4️⃣ Checkout
 
 `POST /cart/checkout`
 
-`Body: { "userId": "user1", "productId": "PRODUCT_ID" }`
+`Body: { "userId": "user1", "productIds": ["PRODUCT_ID"] }`
 
 ## 5️⃣ Get Product Status
 
@@ -187,7 +189,7 @@ Or use Docker container for MongoDB and Redis **(Recommended)**
 
 ## Bonus Point
 
-You can import `flash-deal-api.postman_collection.json` in Postman directly
+You can import `flash-deal-api.postman_collection.json` in Postman directly and test it.
 
 ------------------------------------------------------------------------
 

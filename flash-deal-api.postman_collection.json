@@ -2,7 +2,7 @@
   "info": {
     "name": "Flash Deal API",
     "_postman_id": "flash-deal-collection",
-    "description": "Flash Deal Reservation & Checkout API with environment variables",
+    "description": "Flash Deal Reservation & Checkout API with environment variables (multi-SKU with indexed product IDs)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -20,7 +20,8 @@
         "url": {
           "raw": "http://{{host}}:{{port}}/products",
           "protocol": "http",
-          "host": ["{{host}}:{{port}}"],
+          "host": ["{{host}}"],
+          "port": "{{port}}",
           "path": ["products"]
         }
       },
@@ -29,13 +30,17 @@
           "listen": "test",
           "script": {
             "exec": [
-              "// Save productId from response into environment variable",
+              "// Save productId with incremental index",
               "let response = pm.response.json();",
               "if (response._id) {",
-              "    pm.collectionVariables.set(\"productId\", response._id);",
-              "    console.log(\"Saved productId:\", response._id);",
+              "    let index = pm.collectionVariables.get('productIndex');",
+              "    if (!index) index = 0;",
+              "    else index = parseInt(index);",
+              "    pm.collectionVariables.set(`productId${index}`, response._id);",
+              "    console.log(`Saved productId${index}:`, response._id);",
+              "    pm.collectionVariables.set('productIndex', index + 1);",
               "} else {",
-              "    console.log(\"No _id found in response\");",
+              "    console.log('No _id found in response');",
               "}"
             ],
             "type": "text/javascript"
@@ -48,10 +53,11 @@
       "request": {
         "method": "GET",
         "url": {
-          "raw": "http://{{host}}:{{port}}/products/{{productId}}",
+          "raw": "http://{{host}}:{{port}}/products/{{productId0}}",
           "protocol": "http",
-          "host": ["{{host}}:{{port}}"],
-          "path": ["products", "{{productId}}"]
+          "host": ["{{host}}"],
+          "port": "{{port}}",
+          "path": ["products", "{{productId0}}"]
         }
       }
     },
@@ -64,12 +70,13 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"productId\": \"{{productId}}\",\n  \"quantity\": {{quantity}}\n}"
+          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"items\": [\n    { \"productId\": \"{{productId0}}\", \"quantity\": 1 },\n    { \"productId\": \"{{productId1}}\", \"quantity\": 2 }\n  ]\n}"
         },
         "url": {
           "raw": "http://{{host}}:{{port}}/cart/reserve",
           "protocol": "http",
-          "host": ["{{host}}:{{port}}"],
+          "host": ["{{host}}"],
+          "port": "{{port}}",
           "path": ["cart", "reserve"]
         }
       }
@@ -83,12 +90,13 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"productId\": \"{{productId}}\"\n}"
+          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"productIds\": [\"{{productId0}}\",\"{{productId1}}\"]\n}"
         },
         "url": {
           "raw": "http://{{host}}:{{port}}/cart/cancel",
           "protocol": "http",
-          "host": ["{{host}}:{{port}}"],
+          "host": ["{{host}}"],
+          "port": "{{port}}",
           "path": ["cart", "cancel"]
         }
       }
@@ -102,12 +110,13 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"productId\": \"{{productId}}\"\n}"
+          "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"productIds\": [\"{{productId0}}\",\"{{productId1}}\"]\n}"
         },
         "url": {
           "raw": "http://{{host}}:{{port}}/cart/checkout",
           "protocol": "http",
-          "host": ["{{host}}:{{port}}"],
+          "host": ["{{host}}"],
+          "port": "{{port}}",
           "path": ["cart", "checkout"]
         }
       }
@@ -120,6 +129,6 @@
     { "key": "productName", "value": "Flash Product" },
     { "key": "totalStock", "value": "200" },
     { "key": "quantity", "value": "2" },
-    { "key": "productId", "value": "" }
+    { "key": "productIndex", "value": "0" }
   ]
 }

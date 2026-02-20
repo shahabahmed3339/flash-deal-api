@@ -2,8 +2,8 @@ const cartService = require('../services/cart.service');
 
 exports.reserve = async (req, res, next) => {
   try {
-    const { userId, productId, quantity } = req.body;
-    const result = await cartService.reserveProduct(userId, productId, quantity);
+    const { userId, items } = req.body;
+    const result = await cartService.reserveProducts(userId, items);
     res.json(result);
   } catch (err) {
     next(err);
@@ -12,8 +12,8 @@ exports.reserve = async (req, res, next) => {
 
 exports.cancel = async (req, res, next) => {
   try {
-    const { userId, productId } = req.body;
-    const result = await cartService.cancelReservation(userId, productId);
+    const { userId, productIds } = req.body;
+    const result = await cartService.cancelReservations(userId, productIds);
     res.json(result);
   } catch (err) {
     next(err);
@@ -22,8 +22,8 @@ exports.cancel = async (req, res, next) => {
 
 exports.checkout = async (req, res, next) => {
   try {
-    const { userId, productId } = req.body;
-    const result = await cartService.checkout(userId, productId);
+    const { userId, productIds } = req.body;
+    const result = await cartService.checkout(userId, productIds);
     res.json(result);
   } catch (err) {
     next(err);
