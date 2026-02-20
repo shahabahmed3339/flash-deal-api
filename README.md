@@ -10,7 +10,7 @@ A production-ready stock reservation system built using:
 
 Designed to prevent overselling during high-concurrency flash sales.
 
-[[!DEMO]](https://www.loom.com/share/f00dcfbf97f84e1da2a69dbeac139209)
+[[!DEMO](https://www.loom.com/share/f00dcfbf97f84e1da2a69dbeac139209)](https://www.loom.com/share/f00dcfbf97f84e1da2a69dbeac139209)
 
 ------------------------------------------------------------------------
 
