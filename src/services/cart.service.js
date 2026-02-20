@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const redis = require('../config/redis');
 const Product = require('../models/product.model');
 const Order = require('../models/order.model');
-const { NotFoundError, ConflictError, BadRequestError } = require('../utils/errors');
+const { NotFoundError, ConflictError, BadRequestError, InternalServerError } = require('../utils/errors');
 
 const MULTI_RESERVATION_LUA = `
 -- KEYS: reserved keys for each product
@@ -94,87 +94,95 @@ return 1
 `;
 
 exports.reserveProducts = async (userId, items) => {
-  const products = await Product.find({
-    _id: { $in: items.map(i => i.productId) }
-  });
+  try {
+    const products = await Product.find({
+      _id: { $in: items.map(i => i.productId) }
+    });
 
-  if (products.length !== items.length) {
-    throw new NotFoundError('One or more products not found');
-  }
+    if (products.length !== items.length) {
+      throw new NotFoundError('One or more products not found');
+    }
 
-  const productMap = {};
-  products.forEach(p => productMap[p._id] = p);
+    const productMap = {};
+    products.forEach(p => productMap[p._id] = p);
 
-  const keys = [];
-  const args = [];
+    const keys = [];
+    const args = [];
 
-  args.push(items.length);
+    args.push(items.length);
 
-  for (const item of items) {
-    keys.push(`reserved:product:${item.productId}`);
-  }
+    for (const item of items) {
+      keys.push(`reserved:product:${item.productId}`);
+    }
 
-  for (const item of items) {
-    const product = productMap[item.productId];
+    for (const item of items) {
+      const product = productMap[item.productId];
 
-    args.push(
-      product.totalStock,
-      product.soldStock,
-      item.quantity,
-      process.env.RESERVATION_TTL,
-      `reservation:data:${userId}:${item.productId}`,
-      `reservation:ttl:${userId}:${item.productId}`
+      args.push(
+        product.totalStock,
+        product.soldStock,
+        item.quantity,
+        process.env.RESERVATION_TTL,
+        `reservation:data:${userId}:${item.productId}`,
+        `reservation:ttl:${userId}:${item.productId}`
+      );
+    }
+
+    const result = await redis.eval(
+      MULTI_RESERVATION_LUA,
+      keys.length,
+      ...keys,
+      ...args
     );
+
+    if (result === -1) {
+      throw new ConflictError('One or more items are out of stock');
+    }
+
+    if (result === -2) {
+      throw new ConflictError('User already has a reservation for one or more items');
+    }
+
+    return { message: 'All products reserved for 10 minutes' };
+  } catch (err) {
+    throw new InternalServerError(err);
   }
-
-  const result = await redis.eval(
-    MULTI_RESERVATION_LUA,
-    keys.length,
-    ...keys,
-    ...args
-  );
-
-  if (result === -1) {
-    throw new ConflictError('One or more items are out of stock');
-  }
-
-  if (result === -2) {
-    throw new ConflictError('User already has a reservation for one or more items');
-  }
-
-  return { message: 'All products reserved for 10 minutes' };
 };
 
 exports.cancelReservations = async (userId, productIds) => {
-  const keys = [];
-  const args = [];
+  try {
+    const keys = [];
+    const args = [];
 
-  args.push(productIds.length);
+    args.push(productIds.length);
 
-  for (const productId of productIds) {
-    keys.push(`reserved:product:${productId}`);
+    for (const productId of productIds) {
+      keys.push(`reserved:product:${productId}`);
+    }
+
+    for (const productId of productIds) {
+      keys.push(`reservation:data:${userId}:${productId}`);
+    }
+
+    for (const productId of productIds) {
+      keys.push(`reservation:ttl:${userId}:${productId}`);
+    }
+
+    const result = await redis.eval(
+      MULTI_CANCEL_LUA,
+      keys.length,
+      ...keys,
+      ...args
+    );
+
+    if (result === -1) {
+      throw new BadRequestError('One or more reservations not found');
+    }
+
+    return { message: 'All reservations cancelled successfully' };
+  } catch (err) {
+    throw new InternalServerError(err);
   }
-
-  for (const productId of productIds) {
-    keys.push(`reservation:data:${userId}:${productId}`);
-  }
-
-  for (const productId of productIds) {
-    keys.push(`reservation:ttl:${userId}:${productId}`);
-  }
-
-  const result = await redis.eval(
-    MULTI_CANCEL_LUA,
-    keys.length,
-    ...keys,
-    ...args
-  );
-
-  if (result === -1) {
-    throw new BadRequestError('One or more reservations not found');
-  }
-
-  return { message: 'All reservations cancelled successfully' };
 };
 
 exports.checkout = async (userId, productIds) => {
@@ -238,6 +246,6 @@ exports.checkout = async (userId, productIds) => {
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
-    throw err;
+    throw new InternalServerError(err);
   }
 };

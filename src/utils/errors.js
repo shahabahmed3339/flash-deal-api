@@ -23,9 +23,17 @@ class BadRequestError extends AppError {
   }
 }
 
+class InternalServerError extends AppError {
+  constructor(message = 'Internal Server Error') {
+    console.log(message);
+    super('Internal Server Error', 500);
+  }
+}
+
 module.exports = {
   AppError,
   NotFoundError,
   ConflictError,
-  BadRequestError
+  BadRequestError,
+  InternalServerError
 };
